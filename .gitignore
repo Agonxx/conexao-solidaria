@@ -1,0 +1,24 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Node (frontend, se vier)
+node_modules/
+dist/
+build/
+
+# IDE
+.vs/
+.vscode/
+*.swp
+
+# Secrets locais (nunca commitar valores reais)
+*.env
+appsettings.Development.json
+appsettings.Local.json
+
+# OS
+.DS_Store
+Thumbs.db
