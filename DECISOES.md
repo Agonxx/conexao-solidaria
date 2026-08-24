@@ -35,6 +35,14 @@ Este projeto é nominalmente "do zero", mas boa parte do trabalho de arquitetura
 
 O título da seção de observabilidade no PDF é "Observabilidade (Zabbix e Grafana)", mas o corpo do requisito só cobra `/health`/`/metrics` + dashboard **Grafana** — Zabbix não aparece em nenhum item concreto. Tratando como resquício de template por ora; vale confirmar no Discord da FIAP se restar dúvida.
 
+## Multitenancy
+
+**Decidido não fazer** (2026-08-24). O PDF não pede — plataforma é pra uma única ONG (Esperança Solidária), só dois perfis (`GestorONG`/`Doador`), sem conceito de múltiplas organizações isoladas. Tecnicamente seria simples de adicionar (EF Core `HasQueryFilter` + `TenantId`), mas o custo se espalha por toda entidade/config/teste e não vale nada na nota — tempo melhor investido no que é avaliado (fluxo de evento, observabilidade, pipeline, vídeo). Pode voltar como extra depois do MVP obrigatório estar pronto, se sobrar tempo.
+
+## Padrão de código
+
+Ver [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md) — análise do estilo usado nas APIs da Fase 3/4 (Program.cs enxuto via extension methods, middlewares separados, `InfoToken` scoped, etc.) que vamos reaproveitar aqui.
+
 ## Pontos em aberto
 
 - [ ] Segundo banco de dados (qual e para quê)
