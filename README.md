@@ -33,6 +33,12 @@ MVP de plataforma digital para a ONG **Esperança Solidária**, criado para o Ha
 
 ¹ *Este repositório está privado durante o desenvolvimento; será aberto antes da entrega, conforme exigido.*
 
+## Estrutura de repositórios
+
+Este repositório concentra documentação e decisões. Cada serviço mora em seu próprio repositório, prefixo `F5-CS-{Servico}` (mesmo padrão do FCG4):
+
+- [`F5-CS-UsersApi`](https://github.com/Agonxx/F5-CS-UsersApi) — autenticação JWT + cadastro de doador
+
 ## Como rodar localmente
 
-_(a preencher conforme os serviços forem criados)_
+Cada serviço tem seu próprio `docker-compose.yml` e instruções no README do respectivo repositório.

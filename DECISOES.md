@@ -2,7 +2,9 @@
 
 ## Estrutura do repositório
 
-**Monorepo**, decidido em 2026-08-22 — ainda não sabemos o desenho final dos serviços, e com 1 mês de prazo (bem mais curto que os ~11 meses do projeto FCG anterior) gerenciar um repo só é mais simples que replicar o padrão de repo-por-serviço + Orchestration usado nas fases anteriores. Pode virar multi-repo depois se fizer sentido.
+**Multi-repo, revertido em 2026-08-25** — decisão original (2026-08-22) era monorepo, mas o grupo optou por seguir o mesmo padrão do FCG4: um repositório por serviço, prefixo `F5-CS-{Servico}` (em vez de `F4-FCG-MS-{Servico}`). Este repositório (`conexao-solidaria`) passa a concentrar só documentação/decisões/diagrama; cada serviço mora no seu próprio repo:
+
+- [`F5-CS-UsersApi`](https://github.com/Agonxx/F5-CS-UsersApi) — autenticação JWT + cadastro de doador (pronto e testado)
 
 ## Stack (decidido pelo grupo antes deste documento)
 
