@@ -21,17 +21,18 @@
 
 ### Bancos de dados
 - **SQL Server** → confirmado para `UsersApi` e API da ONG (Campanhas + Doações)
-- Segundo banco (Mongo ou outro) → ainda em aberto. O requisito pede um PDF "justificando por que os bancos de dados X e Y foram escolhidos" (plural), o que sugere que o avaliador espera mais de uma tecnologia — decidir isso é um dos próximos passos.
+- **MongoDB** → **decidido em 2026-08-25**, para relatório de encerramento de campanha (snapshot enxuto: valor arrecadado, % da meta, quantidade de doações — sem lista individual). Gatilho: `Update` de campanha pra `Status = Concluida` publica um evento, um consumer grava o snapshot. Detalhe completo da discussão em [`MENSAGERIA.md`](./MENSAGERIA.md).
 
-## Estratégia: reaproveitar o projeto FCG (Fase 3/4)
+## Estratégia: reaproveitar o projeto FCG (Fase 4)
 
-Este projeto é nominalmente "do zero", mas boa parte do trabalho de arquitetura já foi resolvido no projeto anterior (`C:\FIAP\Fase3`, `C:\FIAP\Fase4`) e dá pra reaproveitar como esqueleto, adaptando o domínio:
+Este projeto é nominalmente "do zero", mas boa parte do trabalho de arquitetura já foi resolvido no projeto anterior e dá pra reaproveitar como esqueleto, adaptando o domínio. Os repositórios locais antigos (`C:\FIAP\Fase3`, `C:\FIAP\Fase4`) não existem mais após reformatações da máquina — a fonte confiável agora são os repositórios públicos no GitHub, clonados em `C:\Dev\Claudia\FIAP4\` sempre que precisar consultar:
 
-- **Padrão de evento assíncrono**: o `FCG-MS-PaymentsAPI` da Fase 4 já é orientado a eventos (`Consumers/`, `Domain/Events/`) — mesma forma exigida aqui pro fluxo Doação → `DoacaoRecebidaEvent` → Worker. Dá pra usar a mesma Clean Architecture (Api/Application/Domain/Infrastructure) trocando o domínio Payment→Doação.
-- **Auth**: `FCG-MS-UsersAPI` já tem JWT + hash de senha (BCrypt) implementado — só trocar os roles pelos exigidos aqui (`GestorONG`/`Doador`).
-- **K8s manifests**: `FCG-MS-Orchestration/k8s/` já tem RabbitMQ, Prometheus, Grafana e Kong funcionando — copiar/adaptar em vez de montar do zero.
-- **CI/CD**: pipeline GitHub Actions do `UsersAPI`/`CatalogAPI` (build + test + Docker) é reaproveitável quase direto, só removendo o estágio de deploy AWS (aqui é opcional e local).
-- **O que fica de fora desta vez** (não exigido pelo PDF): MongoDB avançado, Elasticsearch/OpenSearch, AWS/Lambda/SQS, Terraform/eksctl, Secrets Manager gerenciado.
+- [`Agonxx/F4-FCG-MS-UsersAPI`](https://github.com/Agonxx/F4-FCG-MS-UsersAPI) — JWT + hash de senha (**atenção**: o `CryptoUtils` de lá é AES reversível com chave hardcoded, não é BCrypt de verdade apesar do que a documentação antiga dizia — já corrigido no `F5-CS-UsersApi`)
+- [`Agonxx/F4-FCG-MS-PaymentsAPI`](https://github.com/Agonxx/F4-FCG-MS-PaymentsAPI) — orientado a eventos (MassTransit/RabbitMQ), molde pro fluxo Doação → `DoacaoRecebidaEvent` → Worker
+- [`Agonxx/F4-FCG-MS-Orchestration`](https://github.com/Agonxx/F4-FCG-MS-Orchestration) — k8s com RabbitMQ, Prometheus, Grafana e Kong já funcionando, copiar/adaptar
+- CI/CD: pipeline GitHub Actions do `UsersAPI`/`CatalogAPI` (build + test + Docker) reaproveitável quase direto, removendo o estágio de deploy AWS
+
+Detalhes completos da stack/arquitetura do FCG4 em [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md).
 
 ## Observação sobre o PDF de requisitos
 
@@ -47,8 +48,10 @@ Ver [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md) — análise do estilo usado nas AP
 
 ## Pontos em aberto
 
-- [ ] Segundo banco de dados (qual e para quê)
-- [ ] Nome e escopo definitivo dos serviços (API da ONG, Worker de Doações)
-- [ ] Onde mora o Worker/Consumer do RabbitMQ — serviço dedicado ou dentro de uma API existente
+- [x] Segundo banco de dados → MongoDB, relatório de encerramento de campanha (ver acima e `MENSAGERIA.md`)
+- [x] Onde mora o Worker/Consumer do RabbitMQ → dois Workers separados, um por tipo de evento (ver `MENSAGERIA.md`)
+- [ ] Como compartilhar o contrato do evento entre repos separados (NuGet privado / git submodule / classe duplicada) — **discussão em andamento, ver [`MENSAGERIA.md`](./MENSAGERIA.md)**
+- [ ] Nome e escopo definitivo dos serviços: API de Campanhas+Doações, e os dois Workers (`F5-CS-DoacaoWorker`/`F5-CS-RelatorioWorker` são só sugestão)
 - [ ] Tecnologia do Frontend
 - [ ] Como o Grafana coleta métricas (exporter direto vs. Prometheus no meio — Fase 4 já usa Prometheus como intermediário, reaproveitável)
+- [ ] Escopo de ElasticSearch e do Kong Gateway — ainda não discutido
