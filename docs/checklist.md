@@ -1,6 +1,6 @@
 # Checklist — Conexão Solidária
 
-**Atualizado em 2026-09-26.** Progresso: 18 de 35 itens.
+**Atualizado em 2026-09-26.** Progresso: 20 de 35 itens.
 
 Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atual.md`](estado-atual.md).
 
@@ -16,19 +16,19 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] JWT, cadastro de doador, BCrypt, `GetMe`
 - [x] Testes unitários
 
-## F5-CS-CampanhasApi (6 de 8)
+## F5-CS-CampanhasApi (7 de 8)
 - [x] Estrutura em camadas no padrão do projeto
 - [x] CRUD de campanhas (`GestorONG`) e regras de validação
 - [x] Painel de transparência público
 - [x] Doação (`Doador`) + publica `DoacaoRecebidaEvent`
 - [x] Dockerfile, docker-compose e README
 - [x] 14 testes passando e smoke test com RabbitMQ real
-- [ ] Criar repo no GitHub e commitar
+- [x] Repo privado no GitHub (Agonxx/F5-CS-CampanhasApi) e commit inicial
 - [ ] Login pelo UsersApi de verdade (teste integrado)
 
-## F5-CS-DoacaoWorker (4 de 5)
+## F5-CS-DoacaoWorker (5 de 5)
 - [x] Estrutura em camadas, Dockerfile, compose e README (padrão do PaymentsAPI)
-- [ ] Criar repo no GitHub e commitar
+- [x] Repo privado no GitHub (Agonxx/F5-CS-DoacaoWorker) e commit inicial
 - [x] `DoacaoRecebidaConsumer` atualiza `ValorArrecadado`
 - [x] Evento duplicado + teste de `FullName`
 - [x] Testes unitários (3) e smoke test ponta a ponta com a CampanhasApi
@@ -47,6 +47,7 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [ ] Kong (roteamento simples, depois do MVP)
 
 ## Entregáveis (0 de 6)
+- [ ] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, conexao-solidaria) antes da entrega
 - [ ] README passo a passo (infra + app)
 - [ ] Diagrama de arquitetura no Miro
 - [ ] PDF justificando SQL Server e Mongo

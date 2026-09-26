@@ -15,7 +15,7 @@ Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Trê
 - Frontend e ElasticSearch fora do escopo; Kong só roteamento simples, depois do MVP.
 - Grafana via Prometheus (copiar do `F4-FCG-MS-Orchestration`).
 
-## F5-CS-CampanhasApi (pronto, ainda sem repo no GitHub nem commit)
+## F5-CS-CampanhasApi (pronto; repo privado no GitHub, commit inicial feito)
 - Mesmas camadas e estilo do UsersApi; porta 5002; banco `CampanhasDB`; valida o JWT do UsersApi (mesma `JwtSettings:SecretKey`).
 - Endpoints: `GET Campanha/Transparencia` (público); `GetAll`, `GetById/{id}`, `Criar`, `Atualizar/{id}` (`GestorONG`); `POST Doacao/Doar` e `GET Doacao/MinhasDoacoes` (`Doador`).
 - Doação grava `Doacao` e publica `DoacaoRecebidaEvent(DoacaoId, CampanhaId, DoadorId, Valor, DoadoEm)`; **não** mexe em `ValorArrecadado` (é do Worker).
@@ -33,9 +33,12 @@ Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Trê
 - Rodar: ver README (o Worker entra na rede do compose da CampanhasApi).
 
 ## Próximos passos
-1. Criar repos no GitHub e commitar `F5-CS-CampanhasApi` e `F5-CS-DoacaoWorker`; teste integrado com o login do UsersApi.
+1. Teste integrado com o login real do UsersApi (subir um compose de cada vez: container `sqlserver` e porta 1433 em comum).
 2. `F5-CS-FeedbackApi` (Mongo, JWT do UsersApi, um feedback por doação).
 3. Orquestração k8s + RabbitMQ + Prometheus/Grafana (copiar do Orchestration), CI/CD, Kong, diagrama Miro, PDF dos bancos, vídeo, relatório.
+
+## Repos
+`Agonxx/F5-CS-CampanhasApi` e `Agonxx/F5-CS-DoacaoWorker` estão **privados**; tornar públicos (com UsersApi e conexao-solidaria) antes da entrega. Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo create --public` é bloqueado pelo classificador de permissões: criar privado ou pedir ao usuário.
 
 ## Convenção
 Cada repo novo: nome da subpasta já definido (dentro de `FIAP5`, repo `F5-CS-*`). Ao fechar item, atualizar `checklist.md`.
