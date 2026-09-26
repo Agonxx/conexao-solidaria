@@ -54,7 +54,7 @@ Subidos juntos na mesma rede Docker: SQL Server, RabbitMQ, UsersApi, CampanhasAp
 2. CI/CD (GitHub Actions: build, testes, imagem Docker), Kong, diagrama Miro, PDF dos bancos, vídeo, relatório.
 
 ## Repos
-`Agonxx/F5-CS-CampanhasApi` e `Agonxx/F5-CS-DoacaoWorker` estão **privados** e `Agonxx/F5-CS-FeedbackApi` estão privados; tornar públicos (com UsersApi, FeedbackApi e conexao-solidaria) antes da entrega. Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo create --public` é bloqueado pelo classificador de permissões: criar privado ou pedir ao usuário.
+`Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker` e `Agonxx/F5-CS-FeedbackApi` estão **privados**; tornar públicos (com UsersApi, FeedbackApi e conexao-solidaria) antes da entrega. Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo create --public` é bloqueado pelo classificador de permissões: criar privado ou pedir ao usuário.
 
 ## Convenção
 Cada repo novo: nome da subpasta já definido (dentro de `FIAP5`, repo `F5-CS-*`). Ao fechar item, atualizar `checklist.md`.
