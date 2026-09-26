@@ -1,4 +1,4 @@
-# Mensageria, Workers e o segundo banco de dados — discussão em andamento
+# Mensageria, Workers e o segundo banco de dados
 
 Este documento existe porque o Rafael pediu explicitamente pra ir com calma nessa parte (mensageria, Worker, ElasticSearch, Gateway) — é o que ele quer aprender e validar de verdade, não só ter implementado. Antes de escrever qualquer código dessa área, releia isso com ele e retome de onde parou.
 
@@ -24,26 +24,27 @@ Existem dois fluxos de evento distintos:
 
 Cheguei a sugerir um Worker só (menos peça pra manter num prazo curto), mas o Rafael decidiu **separar em dois serviços/repos**, pelo aprendizado de isolamento de falha/deploy independente. Ainda não batemos o martelo no nome dos repos — sugestão em aberto: `F5-CS-DoacaoWorker` e `F5-CS-RelatorioWorker`.
 
-## Em aberto — é AQUI que a conversa parou
+## Decidido em 2026-09-26: contrato do evento = classe duplicada
 
-### Como compartilhar o contrato do evento entre repos separados
+Escolhida a opção 3 (das três discutidas: NuGet privado, git submodule, classe duplicada), o mesmo padrão do FCG4: `PaymentsAPI` e `CatalogAPI` duplicam `PaymentProcessedEvent` com `namespace Shared.Contracts.Events`. Sem NuGet/submodule: menos peças num prazo curto.
 
-No FCG (monorepo), o padrão documentado em `PADRAO-CODIGO.md` era um projeto `Shared.Contracts.Events` referenciado por quem publica e por quem consome — mesmo assembly, mesmo tipo C#, sem duplicar.
-
-Agora que virou multi-repo (API publicadora + 2 Workers consumidores, cada um no seu próprio repositório `F5-CS-*`), isso deixa de ser trivial. O motivo técnico: o MassTransit, por padrão, identifica o tipo da mensagem pelo **nome completo do tipo + namespace** (ex: `Shared.Contracts.Events.DoacaoRecebidaEvent`) pra rotear no RabbitMQ (exchange/routing key). Se cada repo declarar sua própria classe num namespace diferente, o MassTransit trata como mensagens diferentes e a entrega simplesmente não acontece — é um erro clássico e chato de debugar em sistemas distribuídos.
-
-Três caminhos discutidos, nenhum escolhido ainda:
-
-1. **Pacote NuGet privado** com os contratos de evento, publicado uma vez, referenciado pelos repos que publicam/consomem. Mais correto arquiteturalmente, mas dá trabalho extra de versionamento/publish num prazo de 1 mês.
-2. **Repositório de contratos como git submodule**, referenciado pelos outros repos. Meio-termo, mas submodule é notoriamente incômodo no dia a dia (fácil esquecer de atualizar o ponteiro do submodule).
-3. **Duplicar a classe do evento em cada repo**, garantindo que namespace + nome completo fiquem idênticos em todos. Mais simples de montar agora; o risco é humano — se alguém mudar uma propriedade num repo e esquecer nos outros, a falha é silenciosa (a mensagem é entregue, mas desserializa errado ou perde campo).
-
-**Próximo passo ao retomar**: perguntar ao Rafael qual dessas três opções ele quer explorar, e só então desenhar/codar a API de Campanhas + Doações e os dois Workers.
+- Record `DoacaoRecebidaEvent` copiados na API de Campanhas e no Worker, todos em `namespace Shared.Contracts.Events` (o MassTransit roteia pelo nome completo do tipo).
+- Mitigação do risco de divergência silenciosa: teste unitário no Worker conferindo o `FullName` do tipo .
 
 ### Ainda não resolvido, sem bloquear nada
 
-- Nome definitivo dos dois repositórios de Worker
+- Nome definitivo do repositório do Worker e da FeedbackApi
 - Nome do serviço de Campanhas + Doações (ex.: `F5-CS-CampanhasApi`)
-- Tecnologia do frontend
 - Como o Grafana coleta métricas (Prometheus no meio, como no FCG4, ou exporter direto)
-- Escopo de ElasticSearch e Kong Gateway — ainda nem começamos essa conversa
+- Kong entra depois do MVP; ElasticSearch descartado (ver `DECISOES.md`)
+
+## Revisão em 2026-09-26: Mongo passa a ser o feedback do doador
+
+Substitui o snapshot de encerramento de campanha (seções acima sobre `CampanhaEncerradaEvent`, snapshot e segundo Worker ficam como histórico, **descartadas**).
+
+- **Serviço:** `F5-CS-FeedbackApi`, API síncrona com MongoDB. Sem Worker nem evento — só o fluxo `DoacaoRecebidaEvent` → `DoacaoWorker` usa mensageria.
+- **Quem envia:** `Doador` logado (JWT do UsersApi), um feedback por doação, só do dono da doação.
+- **Documento:** `IdDoacao`, `IdCampanha`, `IdDoador`, data, respostas (rapidez 1–5, dificuldade 1–5, pretende voltar a doar sim/talvez/não, comentário opcional).
+- **Gestor:** endpoint de leitura agregada (média por campanha, % que pretende voltar) para `GestorONG`.
+- **Justificativa pro PDF:** SQL Server pra dados transacionais; Mongo pra documento de formato flexível (perguntas podem mudar sem migração).
+- **Sem frontend:** o doador envia o feedback direto no endpoint (Swagger/Postman) após a doação; sem convite automático.

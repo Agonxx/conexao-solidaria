@@ -1,8 +1,8 @@
 # Conexão Solidária — Hackathon (último semestre FIAP)
 
-Projeto novo, construído do zero (não é continuação do FCG de `C:\FIAP\Fase3`/`Fase4` — mesmo espírito de arquitetura de microsserviços, mas domínio e requisitos diferentes). MVP de plataforma digital para a ONG **Esperança Solidária**, gestão de doadores e campanhas de arrecadação, com foco em escalabilidade, observabilidade e automação.
+Projeto novo (mesmo espírito de arquitetura de microsserviços do FCG, mas domínio e requisitos diferentes), com base no código do FCG em `C:\Dev\Claudia\FIAP4`. MVP de plataforma digital para a ONG **Esperança Solidária**, gestão de doadores e campanhas de arrecadação, com foco em escalabilidade, observabilidade e automação.
 
-Enunciado completo em `C:\Claude\Arquivos\conexao-solidaria-hackathon.md`.
+Este repo (`conexao-solidaria`) guarda só documentação. Cada serviço tem seu próprio repo em `C:\Dev\Claudia\FIAP5`. **Fonte de verdade das decisões: [`DECISOES.md`](./DECISOES.md)** (mensageria em [`MENSAGERIA.md`](./MENSAGERIA.md), padrão de código em [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md)). Enunciado: `Desafio Fiap 5.pdf` neste repo.
 
 ## Requisitos funcionais (resumo)
 
@@ -16,51 +16,42 @@ Enunciado completo em `C:\Claude\Arquivos\conexao-solidaria-hackathon.md`.
 
 | Área | Requisito |
 |---|---|
-| Microsserviços | ≥2 serviços distintos (ex.: API Campanhas/Usuários + Worker de doações) |
-| Mensageria | Doação recebida **não** atualiza o banco direto — publica `DoacaoRecebidaEvent` no broker; um Worker/Consumer separado consome e atualiza o valor arrecadado |
+| Microsserviços | ≥2 serviços distintos |
+| Mensageria | Doação recebida **não** atualiza o banco direto — publica `DoacaoRecebidaEvent`; um Worker separado consome e atualiza o valor arrecadado |
 | Kubernetes | Cluster **local** (Docker Desktop K8s), yamls de Deployments/Services/ConfigMaps |
-| Observabilidade | `/health` ou `/metrics` exposto; dashboard Grafana com métricas reais (CPU/memória dos pods ou contagem de requests) |
-| CI/CD | Pipeline no push pra `main`: build .NET + gera imagem Docker. Deploy automatizado é opcional |
+| Observabilidade | `/health` ou `/metrics`; dashboard Grafana com métricas reais |
+| CI/CD | Push pra `main`: build .NET + imagem Docker. Deploy opcional |
 
-**Bônus (não afeta nota)**: testes unitários (xUnit/NUnit) na esteira de CI; API Gateway roteando pros microsserviços.
+**Bônus**: testes unitários na esteira de CI; API Gateway (Kong).
 
-## Decisões do grupo (fechadas)
+## Decisões fechadas
 
 | Item | Decisão |
 |---|---|
-| API Gateway | Kong |
+| API Gateway | Kong (roteamento simples, depois do MVP) |
 | Broker | RabbitMQ |
-| Observabilidade | Grafana |
+| Observabilidade | Grafana, com Prometheus no meio (copiar do `F4-FCG-MS-Orchestration`) |
 | CI/CD | GitHub Actions |
-| Kubernetes | Docker Desktop K8s (local, não cloud) |
-| Testes unitários | Sim, serão implementados |
-| Diagrama de arquitetura | Miro (versão simples inicial, detalhar depois) |
-| Frontend | Confirmado que vai existir; stack ainda em aberto |
+| Kubernetes | Docker Desktop K8s (local) |
+| Testes unitários | Sim |
+| Diagrama | Miro (versão simples inicial) |
+| Frontend | Fora do escopo (demo via Swagger/Postman) |
+| ElasticSearch | Fora do escopo |
+| Contrato de evento | Classe duplicada por repo, `namespace Shared.Contracts.Events` + teste de `FullName` |
 
-### Bancos de dados
-- **SQL Server** → `UsersApi` e API da ONG (Campanhas + Doações)
-- **MongoDB** → terceira API, escopo ainda a definir
-
-### Serviços planejados
-- `UsersApi` — SQL Server
-- API da ONG (nome em aberto) — Campanhas + Doações — SQL Server
-- API MongoDB (nome e escopo em aberto)
+### Serviços e bancos
+- `F5-CS-UsersApi` — SQL Server (pronto)
+- `F5-CS-CampanhasApi` — Campanhas + Doações, SQL Server, publica `DoacaoRecebidaEvent`
+- `F5-CS-DoacaoWorker` — consome `DoacaoRecebidaEvent`, atualiza valor arrecadado
+- `F5-CS-FeedbackApi` — MongoDB, feedback do doador sobre a doação
 
 ## Entregáveis
 
 1. Repositório público com `README.md` passo a passo (infra + app local).
-2. Diagrama de arquitetura (microsserviços, bancos, broker, observabilidade) + PDF justificando escolha dos bancos.
-3. Vídeo de demonstração (máx. 15 min): diagrama → pipeline CI gerando imagem → `kubectl get pods` + Grafana ao vivo → fluxo completo (login JWT → criar campanha → doação → mensagem na fila → Worker atualiza valor → painel público reflete).
-4. Relatório de entrega (PDF/TXT): grupo, participantes + Discord, links de doc/repo/vídeo.
+2. Diagrama de arquitetura + PDF justificando escolha dos bancos.
+3. Vídeo de demonstração (máx. 15 min): diagrama → pipeline CI → `kubectl get pods` + Grafana ao vivo → fluxo completo (login JWT → campanha → doação → fila → Worker → painel público).
+4. Relatório de entrega (PDF/TXT): grupo, participantes + Discord, links.
 
-## Pontos ainda em aberto
+## Pontos em aberto
 
-- [ ] Nome da API da ONG (Campanhas + Doações)
-- [ ] Nome e escopo da API MongoDB
-- [ ] Onde mora o Worker/Consumer do RabbitMQ — serviço dedicado ou dentro de uma API existente
-- [ ] Tecnologia/escopo do Frontend (cogitado Blazor)
-- [ ] Como o Grafana coleta métricas (exporter direto vs. Prometheus no meio)
-
-## Estrutura de pastas (a criar)
-
-Ainda não há repositórios/código nesta pasta — só este contexto. Ao decidir os nomes dos serviços, seguir o padrão das fases anteriores: cada serviço em sua própria subpasta/repo dentro de `C:\Claude\FIAP5`.
+Nenhum decisório no momento; próximo passo é começar `F5-CS-CampanhasApi`.

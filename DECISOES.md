@@ -17,11 +17,11 @@
 | Kubernetes | Local (Docker Desktop K8s / Minikube / Kind) — **não precisa de nuvem**, confirmado no PDF de requisitos |
 | Testes unitários | Sim, serão implementados (bônus, mas vale o esforço) |
 | Diagrama de arquitetura | Miro |
-| Frontend | Confirmado que vai existir; tecnologia ainda em aberto (cogitado Blazor) |
+| Frontend | **Fora do escopo** (decidido em 2026-09-26) — o PDF não exige; demo via Swagger/Postman |
 
 ### Bancos de dados
 - **SQL Server** → confirmado para `UsersApi` e API da ONG (Campanhas + Doações)
-- **MongoDB** → **decidido em 2026-08-25**, para relatório de encerramento de campanha (snapshot enxuto: valor arrecadado, % da meta, quantidade de doações — sem lista individual). Gatilho: `Update` de campanha pra `Status = Concluida` publica um evento, um consumer grava o snapshot. Detalhe completo da discussão em [`MENSAGERIA.md`](./MENSAGERIA.md).
+- **MongoDB** → **revisado em 2026-09-26**: passa a guardar o **feedback do doador** sobre a doação (documento flexível: rapidez, dificuldade, pretende voltar a doar, comentário). Substitui o snapshot de encerramento de campanha (decidido em 2026-08-25, descartado). Serviço próprio: `F5-CS-FeedbackApi`. Detalhes em [`MENSAGERIA.md`](./MENSAGERIA.md).
 
 ## Estratégia: reaproveitar o projeto FCG (Fase 4)
 
@@ -48,10 +48,10 @@ Ver [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md) — análise do estilo usado nas AP
 
 ## Pontos em aberto
 
-- [x] Segundo banco de dados → MongoDB, relatório de encerramento de campanha (ver acima e `MENSAGERIA.md`)
-- [x] Onde mora o Worker/Consumer do RabbitMQ → dois Workers separados, um por tipo de evento (ver `MENSAGERIA.md`)
-- [ ] Como compartilhar o contrato do evento entre repos separados (NuGet privado / git submodule / classe duplicada) — **discussão em andamento, ver [`MENSAGERIA.md`](./MENSAGERIA.md)**
-- [ ] Nome e escopo definitivo dos serviços: API de Campanhas+Doações, e os dois Workers (`F5-CS-DoacaoWorker`/`F5-CS-RelatorioWorker` são só sugestão)
-- [ ] Tecnologia do Frontend
-- [ ] Como o Grafana coleta métricas (exporter direto vs. Prometheus no meio — Fase 4 já usa Prometheus como intermediário, reaproveitável)
-- [ ] Escopo de ElasticSearch e do Kong Gateway — ainda não discutido
+- [x] Segundo banco de dados → MongoDB, feedback do doador (`F5-CS-FeedbackApi`); snapshot de encerramento descartado em 2026-09-26
+- [x] Onde mora o Worker/Consumer do RabbitMQ → um único Worker (`F5-CS-DoacaoWorker`, consome `DoacaoRecebidaEvent`); o segundo Worker deixou de existir com a troca do Mongo
+- [x] Contrato do evento entre repos → **classe duplicada** em cada repo, mesmo padrão do FCG4 (`PaymentProcessedEvent` em Payments e Catalog), decidido em 2026-09-26. Namespace fixo `Shared.Contracts.Events` em todos os repos (MassTransit roteia pelo nome completo do tipo) + teste unitário em cada Worker conferindo o `FullName`. Ver [`MENSAGERIA.md`](./MENSAGERIA.md)
+- [x] Nomes dos serviços (2026-09-26): `F5-CS-UsersApi` (pronto), `F5-CS-CampanhasApi` (Campanhas+Doações, SQL Server), `F5-CS-DoacaoWorker`, `F5-CS-FeedbackApi` (Mongo)
+- [x] Frontend → descartado, fora do escopo (2026-09-26)
+- [x] Grafana coleta via **Prometheus no meio**, reaproveitando o `F4-FCG-MS-Orchestration` (2026-09-26)
+- [x] Kong Gateway sim (roteamento simples, declarative config, depois do MVP); **ElasticSearch fora do escopo** (2026-09-26)
