@@ -54,4 +54,4 @@ Este repo (`conexao-solidaria`) guarda só documentação. Cada serviço tem seu
 
 ## Pontos em aberto
 
-Nenhum decisório no momento; próximo passo é começar `F5-CS-CampanhasApi`.
+Nenhum decisório no momento. `F5-CS-CampanhasApi` e `F5-CS-DoacaoWorker` estão prontos; próximo passo é o `F5-CS-FeedbackApi`. Estado em [`docs/estado-atual.md`](./docs/estado-atual.md), progresso em [`docs/checklist.md`](./docs/checklist.md).

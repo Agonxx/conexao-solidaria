@@ -5,6 +5,7 @@
 **Multi-repo, revertido em 2026-08-25** — decisão original (2026-08-22) era monorepo, mas o grupo optou por seguir o mesmo padrão do FCG4: um repositório por serviço, prefixo `F5-CS-{Servico}` (em vez de `F4-FCG-MS-{Servico}`). Este repositório (`conexao-solidaria`) passa a concentrar só documentação/decisões/diagrama; cada serviço mora no seu próprio repo:
 
 - [`F5-CS-UsersApi`](https://github.com/Agonxx/F5-CS-UsersApi) — autenticação JWT + cadastro de doador (pronto e testado)
+- `F5-CS-CampanhasApi` — campanhas + doações, publica `DoacaoRecebidaEvent` (pronto e testado localmente em 2026-09-26; repo no GitHub ainda não criado)
 
 ## Stack (decidido pelo grupo antes deste documento)
 

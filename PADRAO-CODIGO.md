@@ -33,7 +33,7 @@ Cada um mora em `Api/Extensions/ServiceCollectionExtensions.cs`, convenção `Ad
 - **`BaseController` abstrato**: `[Route("api/[controller]")][ApiController][Authorize]` + injeta `InfoToken`, controllers concretos só chamam o service e devolvem `Ok(...)`.
 - **Repositórios flat, sem `IRepository<T>` genérico**: métodos exatos que o service precisa (`EmailExists`, `GetMe`), não um CRUD genérico.
 - **Consumer de evento (MassTransit)**: `IConsumer<TEvent>` injeta o service de domínio, processa, publica o evento seguinte. É o molde direto pro Worker de Doações deste projeto (`DoacaoRecebidaConsumer`).
-- **Eventos em projeto compartilhado**: no FCG, os eventos MassTransit moram em `Shared.Contracts.Events`, referenciado tanto por quem publica quanto por quem consome — mesmo tipo, sem duplicar. Faz sentido replicar como um projeto `Shared/` dentro deste monorepo.
+- **Eventos em projeto compartilhado**: no FCG, os eventos MassTransit moram em `Shared.Contracts.Events`, referenciado tanto por quem publica quanto por quem consome — mesmo tipo, sem duplicar. **Superado em 2026-09-26:** o projeto é multi-repo e o contrato ficou como classe duplicada por repo (`namespace Shared.Contracts.Events` + teste de `FullName`), como o `PaymentProcessedEvent` do FCG4. Ver `DECISOES.md`.
 - **Observabilidade de fábrica**: pacote `Prometheus` + `UseHttpMetrics()`/`MapMetrics()` em todo `Program.cs`, mais `CorrelationIdMiddleware`/`RequestLoggingMiddleware` — já cobre o `/metrics` + logs estruturados que o hackathon pede.
 
 ## O que NÃO trazer desta vez
