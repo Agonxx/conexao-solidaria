@@ -1,6 +1,6 @@
 # Checklist — Conexão Solidária
 
-**Atualizado em 2026-09-26.** Progresso: 20 de 35 itens.
+**Atualizado em 2026-09-26.** Progresso: 26 de 38 itens.
 
 Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atual.md`](estado-atual.md).
 
@@ -16,7 +16,7 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] JWT, cadastro de doador, BCrypt, `GetMe`
 - [x] Testes unitários
 
-## F5-CS-CampanhasApi (7 de 8)
+## F5-CS-CampanhasApi (8 de 8)
 - [x] Estrutura em camadas no padrão do projeto
 - [x] CRUD de campanhas (`GestorONG`) e regras de validação
 - [x] Painel de transparência público
@@ -24,7 +24,7 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] Dockerfile, docker-compose e README
 - [x] 14 testes passando e smoke test com RabbitMQ real
 - [x] Repo privado no GitHub (Agonxx/F5-CS-CampanhasApi) e commit inicial
-- [ ] Login pelo UsersApi de verdade (teste integrado)
+- [x] Login pelo UsersApi de verdade (teste integrado, com Worker, em 2026-09-26)
 
 ## F5-CS-DoacaoWorker (5 de 5)
 - [x] Estrutura em camadas, Dockerfile, compose e README (padrão do PaymentsAPI)
@@ -33,11 +33,12 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] Evento duplicado + teste de `FullName`
 - [x] Testes unitários (3) e smoke test ponta a ponta com a CampanhasApi
 
-## F5-CS-FeedbackApi (0 de 4)
-- [ ] API com MongoDB e JWT do UsersApi
-- [ ] Um feedback por doação, só do dono
-- [ ] Leitura agregada para `GestorONG`
-- [ ] Testes unitários
+## F5-CS-FeedbackApi (5 de 5)
+- [x] API com MongoDB e JWT do UsersApi (porta 5004; Dockerfile, compose e README)
+- [x] Um feedback por doação, só do dono (dono conferido via `MinhasDoacoes` da CampanhasApi; índice único no Mongo)
+- [x] Leitura agregada para `GestorONG` (`Feedback/Resumo`)
+- [x] 10 testes unitários passando + smoke test real com Mongo, UsersApi, CampanhasApi e Worker
+- [x] Repo privado no GitHub (Agonxx/F5-CS-FeedbackApi) e commit inicial
 
 ## Infra, observabilidade e CI/CD (0 de 5)
 - [ ] Yamls k8s: Deployments, Services, ConfigMaps
@@ -46,8 +47,8 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [ ] GitHub Actions: build, testes e imagem Docker
 - [ ] Kong (roteamento simples, depois do MVP)
 
-## Entregáveis (0 de 6)
-- [ ] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, conexao-solidaria) antes da entrega
+## Entregáveis (0 de 7)
+- [ ] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, FeedbackApi, conexao-solidaria) antes da entrega
 - [ ] README passo a passo (infra + app)
 - [ ] Diagrama de arquitetura no Miro
 - [ ] PDF justificando SQL Server e Mongo

@@ -43,7 +43,7 @@ Este repo (`conexao-solidaria`) guarda só documentação. Cada serviço tem seu
 - `F5-CS-UsersApi` — SQL Server (pronto)
 - `F5-CS-CampanhasApi` — Campanhas + Doações, SQL Server, publica `DoacaoRecebidaEvent`
 - `F5-CS-DoacaoWorker` — consome `DoacaoRecebidaEvent`, atualiza valor arrecadado
-- `F5-CS-FeedbackApi` — MongoDB, feedback do doador sobre a doação
+- `F5-CS-FeedbackApi` — MongoDB, feedback do doador sobre a doação (pronto)
 
 ## Entregáveis
 
@@ -54,4 +54,4 @@ Este repo (`conexao-solidaria`) guarda só documentação. Cada serviço tem seu
 
 ## Pontos em aberto
 
-Nenhum decisório no momento. `F5-CS-CampanhasApi` e `F5-CS-DoacaoWorker` estão prontos; próximo passo é o `F5-CS-FeedbackApi`. Estado em [`docs/estado-atual.md`](./docs/estado-atual.md), progresso em [`docs/checklist.md`](./docs/checklist.md).
+Nenhum decisório no momento. `F5-CS-CampanhasApi` e `F5-CS-DoacaoWorker` estão prontos; o `F5-CS-FeedbackApi` também. Próximo passo: orquestração k8s, observabilidade e CI/CD. Estado em [`docs/estado-atual.md`](./docs/estado-atual.md), progresso em [`docs/checklist.md`](./docs/checklist.md).
