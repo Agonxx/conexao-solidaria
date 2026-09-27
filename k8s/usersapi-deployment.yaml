@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usersapi
+  namespace: conexao-solidaria
+  labels:
+    app: usersapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: usersapi
+  template:
+    metadata:
+      labels:
+        app: usersapi
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: usersapi
+          image: f5-cs-usersapi:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ConnectionStrings__UsersDB
+              valueFrom:
+                secretKeyRef:
+                  name: usersapi-secret
+                  key: connection-string
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: usersapi-secret
+                  key: jwt-secret-key
+            - name: JwtSettings__ExpiracaoHoras
+              valueFrom:
+                configMapKeyRef:
+                  name: usersapi-config
+                  key: jwt-expiracao-horas
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10

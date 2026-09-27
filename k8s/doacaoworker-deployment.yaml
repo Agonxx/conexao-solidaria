@@ -1,0 +1,66 @@
+# Subir este Deployment ANTES do campanhasapi-deployment: a fila do
+# RabbitMQ só é criada quando o consumidor (este Worker) sobe. Se a
+# CampanhasApi publicar um evento antes disso, ele se perde (ver
+# docs/estado-atual.md, seção "Teste integrado"). O README de deploy
+# do k8s segue essa ordem.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doacaoworker
+  namespace: conexao-solidaria
+  labels:
+    app: doacaoworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doacaoworker
+  template:
+    metadata:
+      labels:
+        app: doacaoworker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: doacaoworker
+          image: f5-cs-doacaoworker:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ConnectionStrings__CampanhasDB
+              valueFrom:
+                secretKeyRef:
+                  name: doacaoworker-secret
+                  key: connection-string
+            - name: RabbitMQ__Host
+              valueFrom:
+                configMapKeyRef:
+                  name: doacaoworker-config
+                  key: rabbitmq-host
+            - name: RabbitMQ__VHost
+              valueFrom:
+                configMapKeyRef:
+                  name: doacaoworker-config
+                  key: rabbitmq-vhost
+            - name: RabbitMQ__Username
+              valueFrom:
+                secretKeyRef:
+                  name: doacaoworker-secret
+                  key: rabbitmq-username
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: doacaoworker-secret
+                  key: rabbitmq-password
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10

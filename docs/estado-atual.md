@@ -1,9 +1,18 @@
 # Estado atual — Conexão Solidária
 
-**Atualizado em 2026-09-26 (noite).** Checklist visual em [`checklist.md`](checklist.md).
+**Atualizado em 2026-09-27.** Checklist visual em [`checklist.md`](checklist.md).
 
 ## Onde paramos
-Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Quatro serviços prontos: `F5-CS-UsersApi`, `F5-CS-CampanhasApi`, `F5-CS-DoacaoWorker` e `F5-CS-FeedbackApi`. O próximo bloco é infra: k8s, RabbitMQ, Prometheus/Grafana e CI/CD.
+Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Quatro serviços prontos: `F5-CS-UsersApi`, `F5-CS-CampanhasApi`, `F5-CS-DoacaoWorker` e `F5-CS-FeedbackApi`. K8s local (Docker Desktop) com RabbitMQ, Mongo, Prometheus e Grafana está de pé e validado (ver seção abaixo). Falta CI/CD, Kong e os entregáveis finais.
+
+## Kubernetes local (Docker Desktop) — pronto e validado (2026-09-27)
+Manifests em [`../k8s/`](../k8s/) (ver [README próprio](../k8s/README.md) para o passo a passo). Namespace `conexao-solidaria`, tudo `ClusterIP` (sem Kong ainda).
+- Imagens buildadas localmente (`f5-cs-*:local`) e importadas manualmente no containerd do node (`docker exec desktop-control-plane ctr -n k8s.io images import -`) — o Docker Desktop Kubernetes **não** compartilha automaticamente as imagens do `docker build` com o containerd do cluster.
+- Ordem de subida: `sqlserver`/`rabbitmq`/`mongo` → `usersapi` + `doacaoworker` (Worker antes da CampanhasApi, por causa do achado da fila) → `campanhasapi` → `feedbackapi`. `UsersApi` e `CampanhasApi` fazem `EnsureCreated`, sem migração manual.
+- Secrets criados via `kubectl create secret generic` (os `*-secret.yaml` no repo são só templates com `PREENCHER_BASE64`).
+- Prometheus descobrindo os 4 pods via annotation `prometheus.io/scrape`; Grafana com dashboard próprio (`cs-dashboard.json`, painéis de RPS, erros 5xx, latência P95, `doacoes_processadas_total`/`doacoes_ignoradas_total` do Worker).
+- **Fluxo ponta a ponta validado**: cadastro de doador → login → login do gestor seed (`gestor@esperancasolidaria.org` / `Gestor@123`) → criar campanha → doar (R$123,45) → evento no RabbitMQ → Worker recalculou → transparência mostrou 123,45 → FeedbackApi validou a doação chamando `campanhasapi:8080` internamente e gravou no Mongo.
+- Pendências: sem PersistentVolumes (dados somem se os pods forem recriados — ok para demo local); Kong fora dos manifests ainda.
 
 ## Estrutura local
 - `C:\Dev\Claudia\FIAP4\` — 5 repos F4-FCG-MS-* (CatalogAPI, NotificationsFunction, PaymentsAPI, UsersAPI, Orchestration), **referência**.
@@ -50,11 +59,13 @@ Subidos juntos na mesma rede Docker: SQL Server, RabbitMQ, UsersApi, CampanhasAp
 - Validado: 10 testes; smoke test real cobrindo envio, repetição, doação alheia, nota inválida, 401/403 e resumo.
 
 ## Próximos passos
-1. Orquestração k8s (Deployments, Services, ConfigMaps) + RabbitMQ + Prometheus/Grafana (copiar do `F4-FCG-MS-Orchestration`); incluir Mongo e a FeedbackApi (`CampanhasApi__BaseUrl` = nome do Service). Cuidar da ordem de subida do Worker (ver achado acima).
-2. CI/CD (GitHub Actions: build, testes, imagem Docker), Kong, diagrama Miro, PDF dos bancos, vídeo, relatório.
+1. CI/CD (GitHub Actions: build, testes, imagem Docker) para os 4 repos.
+2. Kong (API Gateway, roteamento simples) nos manifests k8s.
+3. Diagrama Miro, PDF justificando SQL Server/Mongo, vídeo de demonstração (≤15 min), relatório de entrega.
+4. README passo a passo do `conexao-solidaria` juntando app local + k8s (hoje o passo a passo do k8s está só em `k8s/README.md`).
 
 ## Repos
-`Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker` e `Agonxx/F5-CS-FeedbackApi` estão **privados**; tornar públicos (com UsersApi, FeedbackApi e conexao-solidaria) antes da entrega. Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo create --public` é bloqueado pelo classificador de permissões: criar privado ou pedir ao usuário.
+`Agonxx/F5-CS-UsersApi`, `Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker`, `Agonxx/F5-CS-FeedbackApi` e `Agonxx/conexao-solidaria` estão todos **públicos** (verificado em 27/09/2026). Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo edit --visibility public` é bloqueado pelo classificador de permissões para o Claude Code: o usuário precisa rodar o comando ele mesmo.
 
 ## Convenção
 Cada repo novo: nome da subpasta já definido (dentro de `FIAP5`, repo `F5-CS-*`). Ao fechar item, atualizar `checklist.md`.

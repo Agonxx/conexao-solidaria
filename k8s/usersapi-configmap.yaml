@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: usersapi-config
+  namespace: conexao-solidaria
+data:
+  jwt-expiracao-horas: "2"

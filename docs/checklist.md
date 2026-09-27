@@ -1,6 +1,6 @@
 # Checklist — Conexão Solidária
 
-**Atualizado em 2026-09-26.** Progresso: 26 de 38 itens.
+**Atualizado em 2026-09-27.** Progresso: 30 de 38 itens.
 
 Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atual.md`](estado-atual.md).
 
@@ -40,15 +40,15 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] 10 testes unitários passando + smoke test real com Mongo, UsersApi, CampanhasApi e Worker
 - [x] Repo privado no GitHub (Agonxx/F5-CS-FeedbackApi) e commit inicial
 
-## Infra, observabilidade e CI/CD (0 de 5)
-- [ ] Yamls k8s: Deployments, Services, ConfigMaps
-- [ ] RabbitMQ no cluster local
-- [ ] Prometheus + dashboard Grafana com métricas reais
+## Infra, observabilidade e CI/CD (4 de 5)
+- [x] Yamls k8s: Deployments, Services, ConfigMaps (`conexao-solidaria/k8s/`)
+- [x] RabbitMQ no cluster local
+- [x] Prometheus + dashboard Grafana com métricas reais
 - [ ] GitHub Actions: build, testes e imagem Docker
 - [ ] Kong (roteamento simples, depois do MVP)
 
-## Entregáveis (0 de 7)
-- [ ] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, FeedbackApi, conexao-solidaria) antes da entrega
+## Entregáveis (1 de 7)
+- [x] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, FeedbackApi, conexao-solidaria) antes da entrega
 - [ ] README passo a passo (infra + app)
 - [ ] Diagrama de arquitetura no Miro
 - [ ] PDF justificando SQL Server e Mongo

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feedbackapi
+  namespace: conexao-solidaria
+  labels:
+    app: feedbackapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feedbackapi
+  template:
+    metadata:
+      labels:
+        app: feedbackapi
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: feedbackapi
+          image: f5-cs-feedbackapi:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ConnectionStrings__FeedbackDB
+              valueFrom:
+                configMapKeyRef:
+                  name: feedbackapi-config
+                  key: connection-string
+            - name: MongoDB__Database
+              valueFrom:
+                configMapKeyRef:
+                  name: feedbackapi-config
+                  key: mongodb-database
+            - name: CampanhasApi__BaseUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: feedbackapi-config
+                  key: campanhasapi-baseurl
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: feedbackapi-secret
+                  key: jwt-secret-key
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10

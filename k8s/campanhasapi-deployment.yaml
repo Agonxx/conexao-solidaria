@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campanhasapi
+  namespace: conexao-solidaria
+  labels:
+    app: campanhasapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campanhasapi
+  template:
+    metadata:
+      labels:
+        app: campanhasapi
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: campanhasapi
+          image: f5-cs-campanhasapi:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ConnectionStrings__CampanhasDB
+              valueFrom:
+                secretKeyRef:
+                  name: campanhasapi-secret
+                  key: connection-string
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: campanhasapi-secret
+                  key: jwt-secret-key
+            - name: RabbitMQ__Host
+              valueFrom:
+                configMapKeyRef:
+                  name: campanhasapi-config
+                  key: rabbitmq-host
+            - name: RabbitMQ__VHost
+              valueFrom:
+                configMapKeyRef:
+                  name: campanhasapi-config
+                  key: rabbitmq-vhost
+            - name: RabbitMQ__Username
+              valueFrom:
+                secretKeyRef:
+                  name: campanhasapi-secret
+                  key: rabbitmq-username
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: campanhasapi-secret
+                  key: rabbitmq-password
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10

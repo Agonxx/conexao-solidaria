@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feedbackapi-config
+  namespace: conexao-solidaria
+data:
+  mongodb-database: "FeedbackDB"
+  campanhasapi-baseurl: "http://campanhasapi:8080/"
+  connection-string: "mongodb://mongo:27017"

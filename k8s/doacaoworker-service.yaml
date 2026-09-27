@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: doacaoworker
+  namespace: conexao-solidaria
+spec:
+  selector:
+    app: doacaoworker
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
