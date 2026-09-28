@@ -58,11 +58,13 @@ Subidos juntos na mesma rede Docker: SQL Server, RabbitMQ, UsersApi, CampanhasAp
 - Enums em JSON são numéricos (`pretendeVoltar`: 1 Sim, 2 Talvez, 3 Nao), como no resto do projeto.
 - Validado: 10 testes; smoke test real cobrindo envio, repetição, doação alheia, nota inválida, 401/403 e resumo.
 
+## CI/CD (GitHub Actions) — pronto (2026-09-27)
+Workflow `.github/workflows/ci-cd.yml` nos 4 repos (`build-and-test` + `build-image`): `dotnet build`, `dotnet test` com upload do `.trx`, depois `docker build` só para validar que a imagem builda. **Não publica em nenhum registry** — decisão explícita do usuário para não criar pacotes públicos em `ghcr.io` sem necessidade (o requisito do desafio é só "build .NET + imagem Docker", deploy é opcional). Os 4 pipelines rodaram com sucesso no primeiro push. Sem job de deploy: o cluster k8s é local (Docker Desktop, na máquina do usuário), não alcançável pelo runner do GitHub Actions — deploy continua manual, ver `k8s/README.md`.
+
 ## Próximos passos
-1. CI/CD (GitHub Actions: build, testes, imagem Docker) para os 4 repos.
-2. Kong (API Gateway, roteamento simples) nos manifests k8s.
-3. Diagrama Miro, PDF justificando SQL Server/Mongo, vídeo de demonstração (≤15 min), relatório de entrega.
-4. README passo a passo do `conexao-solidaria` juntando app local + k8s (hoje o passo a passo do k8s está só em `k8s/README.md`).
+1. Kong (API Gateway, roteamento simples) nos manifests k8s.
+2. Diagrama Miro, PDF justificando SQL Server/Mongo, vídeo de demonstração (≤15 min), relatório de entrega.
+3. README passo a passo do `conexao-solidaria` juntando app local + k8s (hoje o passo a passo do k8s está só em `k8s/README.md`).
 
 ## Repos
 `Agonxx/F5-CS-UsersApi`, `Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker`, `Agonxx/F5-CS-FeedbackApi` e `Agonxx/conexao-solidaria` estão todos **públicos** (verificado em 27/09/2026). Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo edit --visibility public` é bloqueado pelo classificador de permissões para o Claude Code: o usuário precisa rodar o comando ele mesmo.

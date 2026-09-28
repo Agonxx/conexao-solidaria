@@ -1,6 +1,6 @@
 # Checklist — Conexão Solidária
 
-**Atualizado em 2026-09-27.** Progresso: 30 de 38 itens.
+**Atualizado em 2026-09-27 (noite).** Progresso: 31 de 38 itens.
 
 Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atual.md`](estado-atual.md).
 
@@ -40,11 +40,11 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] 10 testes unitários passando + smoke test real com Mongo, UsersApi, CampanhasApi e Worker
 - [x] Repo privado no GitHub (Agonxx/F5-CS-FeedbackApi) e commit inicial
 
-## Infra, observabilidade e CI/CD (4 de 5)
+## Infra, observabilidade e CI/CD (5 de 5)
 - [x] Yamls k8s: Deployments, Services, ConfigMaps (`conexao-solidaria/k8s/`)
 - [x] RabbitMQ no cluster local
 - [x] Prometheus + dashboard Grafana com métricas reais
-- [ ] GitHub Actions: build, testes e imagem Docker
+- [x] GitHub Actions: build, testes e validação de build da imagem Docker (4 repos, sem push a registry — ver decisão abaixo)
 - [ ] Kong (roteamento simples, depois do MVP)
 
 ## Entregáveis (1 de 7)
