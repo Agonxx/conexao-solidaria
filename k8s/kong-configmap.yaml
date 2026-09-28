@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-config
+  namespace: conexao-solidaria
+data:
+  kong.yml: |
+    _format_version: "3.0"
+    _transform: true
+
+    # ─── Serviços internos (Kong → microsserviços) ───────────────────────────────
+    # Roteamento simples: cada API já valida o JWT internamente, Kong só encaminha.
+    services:
+
+      # UsersApi
+      - name: usersapi
+        url: http://usersapi:8080
+        routes:
+          - name: usersapi-usuario
+            paths:
+              - /api/Usuario
+            strip_path: false
+
+      # CampanhasApi
+      - name: campanhasapi
+        url: http://campanhasapi:8080
+        routes:
+          - name: campanhasapi-campanha
+            paths:
+              - /api/Campanha
+            strip_path: false
+          - name: campanhasapi-doacao
+            paths:
+              - /api/Doacao
+            strip_path: false
+
+      # FeedbackApi
+      - name: feedbackapi
+        url: http://feedbackapi:8080
+        routes:
+          - name: feedbackapi-feedback
+            paths:
+              - /api/Feedback
+            strip_path: false

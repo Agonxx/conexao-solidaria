@@ -1,0 +1,133 @@
+<svg viewBox="0 0 1500 1020" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="1020" fill="#ffffff"/>
+  <text x="40" y="42" font-size="26" font-weight="700" fill="#0f172a">Conexão Solidária — Arquitetura (MVP)</text>
+  <text x="40" y="66" font-size="14" fill="#475569">Kubernetes local (Docker Desktop) · namespace conexao-solidaria</text>
+
+  <!-- Cluster boundary -->
+  <rect x="30" y="90" width="1440" height="880" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="50" y="115" font-size="13" font-weight="600" fill="#64748b">CLUSTER KUBERNETES (namespace: conexao-solidaria)</text>
+
+  <!-- Client -->
+  <rect x="640" y="140" width="220" height="60" rx="10" fill="#1e293b"/>
+  <text x="750" y="167" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Cliente</text>
+  <text x="750" y="185" font-size="11" fill="#cbd5e1" text-anchor="middle">Swagger / Postman</text>
+
+  <!-- Kong -->
+  <rect x="640" y="240" width="220" height="70" rx="10" fill="#0ea5e9"/>
+  <text x="750" y="270" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Kong</text>
+  <text x="750" y="288" font-size="11" fill="#e0f2fe" text-anchor="middle">API Gateway · roteamento (:8000)</text>
+
+  <line x1="750" y1="200" x2="750" y2="240" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Row: 3 APIs -->
+  <!-- UsersApi -->
+  <rect x="120" y="360" width="260" height="90" rx="10" fill="#334155"/>
+  <text x="250" y="388" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">F5-CS-UsersApi</text>
+  <text x="250" y="406" font-size="11" fill="#cbd5e1" text-anchor="middle">JWT · RBAC · cadastro doador</text>
+  <text x="250" y="422" font-size="11" fill="#cbd5e1" text-anchor="middle">/api/Usuario · :8080</text>
+  <text x="250" y="440" font-size="10" fill="#7dd3fc" text-anchor="middle">/health, /metrics</text>
+
+  <!-- CampanhasApi -->
+  <rect x="620" y="360" width="260" height="90" rx="10" fill="#334155"/>
+  <text x="750" y="388" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">F5-CS-CampanhasApi</text>
+  <text x="750" y="406" font-size="11" fill="#cbd5e1" text-anchor="middle">Campanhas + Doações</text>
+  <text x="750" y="422" font-size="11" fill="#cbd5e1" text-anchor="middle">/api/Campanha, /api/Doacao · :8080</text>
+  <text x="750" y="440" font-size="10" fill="#7dd3fc" text-anchor="middle">/health, /metrics</text>
+
+  <!-- FeedbackApi -->
+  <rect x="1120" y="360" width="260" height="90" rx="10" fill="#334155"/>
+  <text x="1250" y="388" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">F5-CS-FeedbackApi</text>
+  <text x="1250" y="406" font-size="11" fill="#cbd5e1" text-anchor="middle">Feedback do doador</text>
+  <text x="1250" y="422" font-size="11" fill="#cbd5e1" text-anchor="middle">/api/Feedback · :8080</text>
+  <text x="1250" y="440" font-size="10" fill="#7dd3fc" text-anchor="middle">/health, /metrics</text>
+
+  <!-- Kong -> 3 APIs -->
+  <line x1="700" y1="310" x2="280" y2="360" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="750" y1="310" x2="750" y2="360" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="800" y1="310" x2="1220" y2="360" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- FeedbackApi -> CampanhasApi (sync internal call) -->
+  <path d="M1120,430 C 1000,430 900,430 880,410" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <text x="990" y="463" font-size="10" fill="#7c3aed" text-anchor="middle">valida doação (chamada síncrona interna)</text>
+
+  <!-- Databases row -->
+  <!-- SQL Server (Users) -->
+  <rect x="90" y="520" width="180" height="70" rx="10" fill="#0f766e"/>
+  <text x="180" y="550" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">SQL Server</text>
+  <text x="180" y="568" font-size="11" fill="#ccfbf1" text-anchor="middle">UsersDB</text>
+
+  <!-- SQL Server (Campanhas) -->
+  <rect x="620" y="520" width="260" height="70" rx="10" fill="#0f766e"/>
+  <text x="750" y="550" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">SQL Server</text>
+  <text x="750" y="568" font-size="11" fill="#ccfbf1" text-anchor="middle">CampanhasDB (Campanhas + Doacoes)</text>
+
+  <!-- MongoDB (Feedback) -->
+  <rect x="1160" y="520" width="180" height="70" rx="10" fill="#166534"/>
+  <text x="1250" y="550" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">MongoDB</text>
+  <text x="1250" y="568" font-size="11" fill="#dcfce7" text-anchor="middle">FeedbackDB (feedbacks)</text>
+
+  <line x1="250" y1="450" x2="200" y2="520" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="750" y1="450" x2="750" y2="520" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="1250" y1="450" x2="1250" y2="520" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- RabbitMQ -->
+  <rect x="620" y="650" width="260" height="70" rx="10" fill="#f97316"/>
+  <text x="750" y="680" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">RabbitMQ</text>
+  <text x="750" y="698" font-size="11" fill="#ffedd5" text-anchor="middle">broker · DoacaoRecebidaEvent</text>
+
+  <!-- CampanhasApi -> RabbitMQ (publish, async) -->
+  <line x1="750" y1="590" x2="750" y2="650" stroke="#b45309" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrow-async)"/>
+  <text x="850" y="625" font-size="10" fill="#b45309">publica evento</text>
+
+  <!-- DoacaoWorker -->
+  <rect x="620" y="760" width="260" height="90" rx="10" fill="#334155"/>
+  <text x="750" y="788" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">F5-CS-DoacaoWorker</text>
+  <text x="750" y="806" font-size="11" fill="#cbd5e1" text-anchor="middle">consome evento, recalcula</text>
+  <text x="750" y="822" font-size="11" fill="#cbd5e1" text-anchor="middle">ValorArrecadado (CampanhasDB)</text>
+  <text x="750" y="840" font-size="10" fill="#7dd3fc" text-anchor="middle">/health, /metrics · :8080</text>
+
+  <!-- RabbitMQ -> Worker (consume, async) -->
+  <line x1="750" y1="720" x2="750" y2="760" stroke="#b45309" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrow-async)"/>
+  <text x="855" y="745" font-size="10" fill="#b45309">consome evento</text>
+
+  <!-- Worker -> CampanhasDB (update) -->
+  <path d="M880,780 C 1000,780 1000,580 850,555" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="1000" y="670" font-size="10" fill="#334155" text-anchor="end">UPDATE ValorArrecadado</text>
+
+  <!-- Observability -->
+  <rect x="1120" y="650" width="260" height="70" rx="10" fill="#7c2d92"/>
+  <text x="1250" y="680" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Prometheus</text>
+  <text x="1250" y="698" font-size="11" fill="#f3e8ff" text-anchor="middle">scrape /metrics dos 4 serviços</text>
+
+  <rect x="1120" y="760" width="260" height="70" rx="10" fill="#a21caf"/>
+  <text x="1250" y="790" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Grafana</text>
+  <text x="1250" y="808" font-size="11" fill="#fae8ff" text-anchor="middle">dashboard: RPS, erros 5xx, P95, doações</text>
+
+  <line x1="1250" y1="720" x2="1250" y2="760" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Prometheus scrape lines (dotted) from the 4 app services -->
+  <path d="M250,450 C 250,600 1000,660 1120,678" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <path d="M750,450 C 750,540 900,620 1120,668" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <path d="M1250,450 C 1250,520 1250,600 1250,650" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <path d="M880,800 C 1000,800 1050,730 1120,690" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+  <!-- Legend -->
+  <rect x="60" y="900" width="1380" height="50" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <line x1="80" y1="925" x2="115" y2="925" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="122" y="929" font-size="11" fill="#334155">chamada síncrona (HTTP)</text>
+  <line x1="320" y1="925" x2="355" y2="925" stroke="#b45309" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrow-async)"/>
+  <text x="362" y="929" font-size="11" fill="#b45309">mensageria assíncrona (RabbitMQ)</text>
+  <line x1="640" y1="925" x2="675" y2="925" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <text x="682" y="929" font-size="11" fill="#a21caf">coleta de métricas (Prometheus scrape)</text>
+  <line x1="990" y1="925" x2="1025" y2="925" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <text x="1032" y="929" font-size="11" fill="#7c3aed">chamada interna (mesma origem doação)</text>
+</svg>

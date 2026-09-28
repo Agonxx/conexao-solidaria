@@ -1,9 +1,16 @@
 # Estado atual — Conexão Solidária
 
-**Atualizado em 2026-09-27.** Checklist visual em [`checklist.md`](checklist.md).
+**Atualizado em 2026-09-28.** Checklist visual em [`checklist.md`](checklist.md).
 
 ## Onde paramos
-Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Quatro serviços prontos: `F5-CS-UsersApi`, `F5-CS-CampanhasApi`, `F5-CS-DoacaoWorker` e `F5-CS-FeedbackApi`. K8s local (Docker Desktop) com RabbitMQ, Mongo, Prometheus e Grafana está de pé e validado (ver seção abaixo). Falta CI/CD, Kong e os entregáveis finais.
+Decisões de arquitetura fechadas (ver [`../DECISOES.md`](../DECISOES.md)). Quatro serviços prontos: `F5-CS-UsersApi`, `F5-CS-CampanhasApi`, `F5-CS-DoacaoWorker` e `F5-CS-FeedbackApi`. K8s local (Docker Desktop) com RabbitMQ, Mongo, Prometheus, Grafana e agora **Kong** está de pé e validado (ver seções abaixo). Falta só os entregáveis finais (diagrama, PDF, vídeo, relatório) e o README consolidado.
+
+## Kong (API Gateway) — pronto e validado (2026-09-28)
+Manifests em [`../k8s/`](../k8s/) (`kong-configmap.yaml`, `kong-deployment.yaml`, `kong-service.yaml`). DB-less (`KONG_DATABASE=off`), config declarativa via ConfigMap — sem Postgres extra no cluster.
+- Roteamento simples, como decidido: cada API continua validando o próprio JWT, o Kong só encaminha por prefixo de path (`/api/Usuario` → `usersapi`, `/api/Campanha` e `/api/Doacao` → `campanhasapi`, `/api/Feedback` → `feedbackapi`), `strip_path: false`. Sem plugin JWT no Kong (diferente do FCG4) — decisão consciente de manter simples.
+- `doacaoworker` não entra no gateway (não expõe API pública, só `/health`/`/metrics` scrapeado direto pelo Prometheus).
+- Validado no cluster já de pé: login real do gestor seed via `POST /api/Usuario/Auth` através do Kong (retornou JWT válido), `GET /api/Campanha/Transparencia` retornou dados reais, `GET /api/Feedback/Meus` sem token retornou 401 (backend validando normalmente atrás do proxy), rota inexistente retornou 404.
+- Acesso único agora é `kubectl port-forward svc/kong 15000:8000` (proxy) — os `port-forward` direto nos serviços de app viram redundantes, mas continuam funcionando para debug.
 
 ## Kubernetes local (Docker Desktop) — pronto e validado (2026-09-27)
 Manifests em [`../k8s/`](../k8s/) (ver [README próprio](../k8s/README.md) para o passo a passo). Namespace `conexao-solidaria`, tudo `ClusterIP` (sem Kong ainda).
@@ -61,10 +68,16 @@ Subidos juntos na mesma rede Docker: SQL Server, RabbitMQ, UsersApi, CampanhasAp
 ## CI/CD (GitHub Actions) — pronto (2026-09-27)
 Workflow `.github/workflows/ci-cd.yml` nos 4 repos (`build-and-test` + `build-image`): `dotnet build`, `dotnet test` com upload do `.trx`, depois `docker build` só para validar que a imagem builda. **Não publica em nenhum registry** — decisão explícita do usuário para não criar pacotes públicos em `ghcr.io` sem necessidade (o requisito do desafio é só "build .NET + imagem Docker", deploy é opcional). Os 4 pipelines rodaram com sucesso no primeiro push. Sem job de deploy: o cluster k8s é local (Docker Desktop, na máquina do usuário), não alcançável pelo runner do GitHub Actions — deploy continua manual, ver `k8s/README.md`.
 
+## Diagrama de arquitetura e PDF dos bancos — pronto (2026-09-28)
+Em [`../entregaveis/`](../entregaveis/): `diagrama-arquitetura.svg`/`.png` (microsserviços, Kong, SQL Server, MongoDB, RabbitMQ, Prometheus/Grafana, com legenda de tipos de chamada) e `justificativa-bancos-de-dados.pdf` (SQL Server para Users/Campanhas/Doações por integridade referencial e atomicidade no recálculo do valor arrecadado; MongoDB para o Feedback por schema mais fluido e documento auto-contido).
+- **Sem integração com Miro nesta sessão** (nenhum conector disponível) — o diagrama foi entregue como imagem (PNG, pronta pra colar num board do Miro) e SVG fonte, em vez de montado direto no board.
+
+## README consolidado — pronto (2026-09-28)
+[`../README.md`](../README.md) reescrito: status atual, diagrama embutido, tabela de requisitos atendidos, links dos 5 repos, passo a passo resumido do k8s (build → secrets → infra → serviços na ordem certa → Kong), como acessar via Kong, observabilidade, CI/CD e limitações conhecidas. O `k8s/README.md` continua como referência detalhada (valores completos dos secrets, troubleshooting).
+
 ## Próximos passos
-1. Kong (API Gateway, roteamento simples) nos manifests k8s.
-2. Diagrama Miro, PDF justificando SQL Server/Mongo, vídeo de demonstração (≤15 min), relatório de entrega.
-3. README passo a passo do `conexao-solidaria` juntando app local + k8s (hoje o passo a passo do k8s está só em `k8s/README.md`).
+1. Vídeo de demonstração (≤15 min).
+2. Relatório de entrega (grupo, participantes/Discord, links de doc/repo/vídeo).
 
 ## Repos
 `Agonxx/F5-CS-UsersApi`, `Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker`, `Agonxx/F5-CS-FeedbackApi` e `Agonxx/conexao-solidaria` estão todos **públicos** (verificado em 27/09/2026). Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo edit --visibility public` é bloqueado pelo classificador de permissões para o Claude Code: o usuário precisa rodar o comando ele mesmo.

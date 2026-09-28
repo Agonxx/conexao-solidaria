@@ -1,6 +1,6 @@
 # Checklist — Conexão Solidária
 
-**Atualizado em 2026-09-27 (noite).** Progresso: 31 de 38 itens.
+**Atualizado em 2026-09-28.** Progresso: 35 de 38 itens.
 
 Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atual.md`](estado-atual.md).
 
@@ -40,18 +40,18 @@ Legenda: `[x]` feito · `[ ]` pendente. Detalhe do momento atual em [`estado-atu
 - [x] 10 testes unitários passando + smoke test real com Mongo, UsersApi, CampanhasApi e Worker
 - [x] Repo privado no GitHub (Agonxx/F5-CS-FeedbackApi) e commit inicial
 
-## Infra, observabilidade e CI/CD (5 de 5)
+## Infra, observabilidade e CI/CD (6 de 6)
 - [x] Yamls k8s: Deployments, Services, ConfigMaps (`conexao-solidaria/k8s/`)
 - [x] RabbitMQ no cluster local
 - [x] Prometheus + dashboard Grafana com métricas reais
 - [x] GitHub Actions: build, testes e validação de build da imagem Docker (4 repos, sem push a registry — ver decisão abaixo)
-- [ ] Kong (roteamento simples, depois do MVP)
+- [x] Kong (roteamento simples, DB-less, validado no cluster em 2026-09-28)
 
-## Entregáveis (1 de 7)
+## Entregáveis (4 de 7)
 - [x] Tornar públicos os repos (UsersApi, CampanhasApi, DoacaoWorker, FeedbackApi, conexao-solidaria) antes da entrega
-- [ ] README passo a passo (infra + app)
-- [ ] Diagrama de arquitetura no Miro
-- [ ] PDF justificando SQL Server e Mongo
+- [x] README passo a passo (infra + app) — `conexao-solidaria/README.md` consolidado
+- [x] Diagrama de arquitetura (`entregaveis/diagrama-arquitetura.svg`/`.png`, pronto pra importar no Miro como imagem — sem integração Miro disponível pra montar o board direto)
+- [x] PDF justificando SQL Server e Mongo (`entregaveis/justificativa-bancos-de-dados.pdf`)
 - [ ] Vídeo de demonstração (até 15 min)
 - [ ] Relatório de entrega
 - [ ] Atualizar `estado-atual.md` com o que foi feito

@@ -96,16 +96,39 @@ kubectl get pods -n conexao-solidaria -w
 
 Aguarde todos os pods `Running` (1/1): `sqlserver`, `rabbitmq`, `mongo`, `usersapi`, `campanhasapi`, `doacaoworker`, `feedbackapi`, `prometheus`, `grafana`.
 
-## Acessando os serviços (todos `ClusterIP` — sem Kong ainda)
+## Etapa 5 — Kong (API Gateway)
+
+Kong roda **DB-less** (config declarativa, sem banco próprio): a `kong-configmap.yaml` já define os `services`/`routes` para `usersapi`, `campanhasapi` e `feedbackapi` (roteamento simples — cada API continua validando o próprio JWT, Kong só encaminha por prefixo de path). O `doacaoworker` não entra no gateway: não expõe API pública, só `/health`/`/metrics` (scrapeado direto pelo Prometheus).
 
 ```bash
-kubectl port-forward svc/usersapi     15001:8080 -n conexao-solidaria
-kubectl port-forward svc/campanhasapi 15002:8080 -n conexao-solidaria
-kubectl port-forward svc/doacaoworker 15003:8080 -n conexao-solidaria
-kubectl port-forward svc/feedbackapi  15004:8080 -n conexao-solidaria
-kubectl port-forward svc/rabbitmq     15672:15672 -n conexao-solidaria   # management UI (guest/guest)
-kubectl port-forward svc/prometheus   15090:9090  -n conexao-solidaria
-kubectl port-forward svc/grafana      15300:3000  -n conexao-solidaria   # admin/admin
+kubectl apply -f kong-configmap.yaml -f kong-deployment.yaml -f kong-service.yaml
+kubectl wait --for=condition=ready pod -l app=kong -n conexao-solidaria --timeout=120s
+```
+
+Se editar `kong-configmap.yaml` depois de já aplicado, reaplique e reinicie o pod (ele lê a config declarativa só na subida):
+
+```bash
+kubectl apply -f kong-configmap.yaml
+kubectl rollout restart deployment kong -n conexao-solidaria
+```
+
+## Acessando os serviços
+
+Com o Kong no ar, o proxy (porta 8000) é o único ponto de entrada da aplicação:
+
+```bash
+kubectl port-forward svc/kong 15000:8000 -n conexao-solidaria   # proxy Kong — todas as APIs
+kubectl port-forward svc/kong 15001:8001 -n conexao-solidaria   # admin API do Kong (status, /status)
+```
+
+Exemplos: `POST http://localhost:15000/api/Usuario/login`, `GET http://localhost:15000/api/Campanha/Transparencia`, `POST http://localhost:15000/api/Feedback/Enviar`.
+
+Infraestrutura e observabilidade continuam acessadas direto (não passam pelo Kong):
+
+```bash
+kubectl port-forward svc/rabbitmq   15672:15672 -n conexao-solidaria   # management UI (guest/guest)
+kubectl port-forward svc/prometheus 15090:9090  -n conexao-solidaria
+kubectl port-forward svc/grafana    15300:3000  -n conexao-solidaria   # admin/admin
 ```
 
 ## Validado em 27/09/2026
@@ -114,6 +137,5 @@ Fluxo ponta a ponta rodando neste cluster: cadastro de doador → login (`UsersA
 
 ## Pendências
 
-- Kong (API Gateway) ainda não está nos manifests — próximo passo depois deste MVP de k8s.
 - Sem PersistentVolumes: dados do SQL Server/Mongo/RabbitMQ somem se os pods forem recriados (aceitável para demo local).
 - CI/CD (GitHub Actions) ainda não builda/publica essas imagens automaticamente.
