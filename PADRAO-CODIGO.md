@@ -1,6 +1,6 @@
-# Padrão de código a seguir (herdado do FCG — Fase 3/4)
+# Padrão de código (herdado do FCG — Fase 3/4)
 
-Análise do estilo usado nas APIs .NET do projeto anterior (`UsersAPI`, `PaymentsAPI`, repos `Agonxx/F4-FCG-MS-*`), pra reaproveitar aqui. A base desse estilo (Program.cs enxuto, extension methods, separação em Extensions/Middlewares) foi escrita pelo Rafael; ajustes pontuais foram feitos com o Claude Code.
+Estilo reaproveitado das APIs .NET do projeto anterior (`UsersAPI`, `PaymentsAPI`, repos `Agonxx/F4-FCG-MS-*`): Program.cs enxuto via extension methods, separação em Extensions/Middlewares.
 
 ## Camadas (Clean Architecture pragmático)
 

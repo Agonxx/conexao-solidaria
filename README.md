@@ -149,4 +149,4 @@ gh repo clone Agonxx/F5-CS-DoacaoWorker
 gh repo clone Agonxx/F5-CS-FeedbackApi
 ```
 
-Leia [`DECISOES.md`](DECISOES.md) e [`docs/estado-atual.md`](docs/estado-atual.md) antes de continuar o desenvolvimento.
+Mais detalhes das decisões de arquitetura em [`DECISOES.md`](DECISOES.md).

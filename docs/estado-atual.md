@@ -83,7 +83,7 @@ Em [`../entregaveis/`](../entregaveis/): `diagrama-arquitetura.svg`/`.png` (micr
 2. Relatório de entrega (grupo, participantes/Discord, links de doc/repo/vídeo).
 
 ## Repos
-`Agonxx/F5-CS-UsersApi`, `Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker`, `Agonxx/F5-CS-FeedbackApi` e `Agonxx/conexao-solidaria` estão todos **públicos** (verificado em 27/09/2026). Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo edit --visibility public` é bloqueado pelo classificador de permissões para o Claude Code: o usuário precisa rodar o comando ele mesmo.
+`Agonxx/F5-CS-UsersApi`, `Agonxx/F5-CS-CampanhasApi`, `Agonxx/F5-CS-DoacaoWorker`, `Agonxx/F5-CS-FeedbackApi` e `Agonxx/conexao-solidaria` estão todos **públicos** (verificado em 27/09/2026). Identidade git `Rafael <rafhita1@gmail.com>` configurada só localmente nesses repos (a máquina não tem config global). `gh repo edit --visibility public` precisa ser rodado manualmente pelo dono da conta (restrição de permissão da CLI autenticada).
 
 ## Convenção
 Cada repo novo: nome da subpasta já definido (dentro de `FIAP5`, repo `F5-CS-*`). Ao fechar item, atualizar `checklist.md`.

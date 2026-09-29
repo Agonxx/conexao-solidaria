@@ -2,57 +2,46 @@
 
 ## Estrutura do repositório
 
-**Multi-repo, revertido em 2026-08-25** — decisão original (2026-08-22) era monorepo, mas o grupo optou por seguir o mesmo padrão do FCG4: um repositório por serviço, prefixo `F5-CS-{Servico}` (em vez de `F4-FCG-MS-{Servico}`). Este repositório (`conexao-solidaria`) passa a concentrar só documentação/decisões/diagrama; cada serviço mora no seu próprio repo:
+Multi-repo, seguindo o mesmo padrão do FCG4: um repositório por serviço, prefixo `F5-CS-{Servico}` (em vez de `F4-FCG-MS-{Servico}`). Este repositório (`conexao-solidaria`) concentra documentação, decisões e diagrama; cada serviço mora no seu próprio repo:
 
-- [`F5-CS-UsersApi`](https://github.com/Agonxx/F5-CS-UsersApi) — autenticação JWT + cadastro de doador (pronto e testado)
-- `F5-CS-CampanhasApi` — campanhas + doações, publica `DoacaoRecebidaEvent` (pronto e testado localmente em 2026-09-26; repo no GitHub ainda não criado)
+- [`F5-CS-UsersApi`](https://github.com/Agonxx/F5-CS-UsersApi) — autenticação JWT + cadastro de doador
+- [`F5-CS-CampanhasApi`](https://github.com/Agonxx/F5-CS-CampanhasApi) — campanhas + doações, publica `DoacaoRecebidaEvent`
+- [`F5-CS-DoacaoWorker`](https://github.com/Agonxx/F5-CS-DoacaoWorker) — consome `DoacaoRecebidaEvent`, atualiza valor arrecadado
+- [`F5-CS-FeedbackApi`](https://github.com/Agonxx/F5-CS-FeedbackApi) — feedback do doador sobre a doação
 
-## Stack (decidido pelo grupo antes deste documento)
+## Stack
 
 | Item | Decisão |
 |---|---|
 | API Gateway | Kong |
 | Broker de mensageria | RabbitMQ |
-| Observabilidade | Grafana |
+| Observabilidade | Grafana, com Prometheus no meio |
 | CI/CD | GitHub Actions |
-| Kubernetes | Local (Docker Desktop K8s / Minikube / Kind) — **não precisa de nuvem**, confirmado no PDF de requisitos |
-| Testes unitários | Sim, serão implementados (bônus, mas vale o esforço) |
-| Diagrama de arquitetura | Miro |
-| Frontend | **Fora do escopo** (decidido em 2026-09-26) — o PDF não exige; demo via Swagger/Postman |
+| Kubernetes | Local (Docker Desktop) — o desafio não exige nuvem |
+| Testes unitários | Sim, nos 4 serviços |
+| Diagrama de arquitetura | Entregue como SVG/PNG |
+| Frontend | Fora do escopo — demo via Swagger/Postman |
 
 ### Bancos de dados
-- **SQL Server** → confirmado para `UsersApi` e API da ONG (Campanhas + Doações)
-- **MongoDB** → **revisado em 2026-09-26**: passa a guardar o **feedback do doador** sobre a doação (documento flexível: rapidez, dificuldade, pretende voltar a doar, comentário). Substitui o snapshot de encerramento de campanha (decidido em 2026-08-25, descartado). Serviço próprio: `F5-CS-FeedbackApi`. Detalhes em [`MENSAGERIA.md`](./MENSAGERIA.md).
 
-## Estratégia: reaproveitar o projeto FCG (Fase 4)
+- **SQL Server** para `UsersApi` e para a API de Campanhas + Doações — dados transacionais e relacionais, com integridade referencial e atomicidade no recálculo do valor arrecadado.
+- **MongoDB** para o feedback do doador sobre a doação (`F5-CS-FeedbackApi`) — schema mais fluido, documento auto-contido (rapidez, dificuldade, pretende voltar a doar, comentário).
 
-Este projeto é nominalmente "do zero", mas boa parte do trabalho de arquitetura já foi resolvido no projeto anterior e dá pra reaproveitar como esqueleto, adaptando o domínio. Os repositórios locais antigos (`C:\FIAP\Fase3`, `C:\FIAP\Fase4`) não existem mais após reformatações da máquina — a fonte confiável agora são os repositórios públicos no GitHub, clonados em `C:\Dev\Claudia\FIAP4\` sempre que precisar consultar:
+## Reaproveitamento do projeto FCG (Fase 4)
 
-- [`Agonxx/F4-FCG-MS-UsersAPI`](https://github.com/Agonxx/F4-FCG-MS-UsersAPI) — JWT + hash de senha (**atenção**: o `CryptoUtils` de lá é AES reversível com chave hardcoded, não é BCrypt de verdade apesar do que a documentação antiga dizia — já corrigido no `F5-CS-UsersApi`)
-- [`Agonxx/F4-FCG-MS-PaymentsAPI`](https://github.com/Agonxx/F4-FCG-MS-PaymentsAPI) — orientado a eventos (MassTransit/RabbitMQ), molde pro fluxo Doação → `DoacaoRecebidaEvent` → Worker
-- [`Agonxx/F4-FCG-MS-Orchestration`](https://github.com/Agonxx/F4-FCG-MS-Orchestration) — k8s com RabbitMQ, Prometheus, Grafana e Kong já funcionando, copiar/adaptar
-- CI/CD: pipeline GitHub Actions do `UsersAPI`/`CatalogAPI` (build + test + Docker) reaproveitável quase direto, removendo o estágio de deploy AWS
+Boa parte da arquitetura já tinha sido resolvida no projeto anterior (`Agonxx/F4-FCG-MS-*`) e foi adaptada para este domínio:
 
-Detalhes completos da stack/arquitetura do FCG4 em [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md).
+- `F4-FCG-MS-UsersAPI` — base para autenticação JWT + hash de senha (com BCrypt de verdade, diferente do AES reversível usado lá)
+- `F4-FCG-MS-PaymentsAPI` — molde para o fluxo orientado a eventos (MassTransit/RabbitMQ): Doação → `DoacaoRecebidaEvent` → Worker
+- `F4-FCG-MS-Orchestration` — base para o k8s com RabbitMQ, Prometheus, Grafana e Kong
+- Pipeline de CI/CD do `UsersAPI`/`CatalogAPI` (build + test + Docker), sem o estágio de deploy AWS
 
-## Observação sobre o PDF de requisitos
-
-O título da seção de observabilidade no PDF é "Observabilidade (Zabbix e Grafana)", mas o corpo do requisito só cobra `/health`/`/metrics` + dashboard **Grafana** — Zabbix não aparece em nenhum item concreto. Tratando como resquício de template por ora; vale confirmar no Discord da FIAP se restar dúvida.
+Padrão de código detalhado em [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md).
 
 ## Multitenancy
 
-**Decidido não fazer** (2026-08-24). O PDF não pede — plataforma é pra uma única ONG (Esperança Solidária), só dois perfis (`GestorONG`/`Doador`), sem conceito de múltiplas organizações isoladas. Tecnicamente seria simples de adicionar (EF Core `HasQueryFilter` + `TenantId`), mas o custo se espalha por toda entidade/config/teste e não vale nada na nota — tempo melhor investido no que é avaliado (fluxo de evento, observabilidade, pipeline, vídeo). Pode voltar como extra depois do MVP obrigatório estar pronto, se sobrar tempo.
+Decidido não implementar. A plataforma atende uma única ONG (Esperança Solidária), com dois perfis (`GestorONG`/`Doador`) e sem conceito de múltiplas organizações isoladas — não é um requisito do desafio.
 
-## Padrão de código
+## Contrato de evento entre serviços
 
-Ver [`PADRAO-CODIGO.md`](./PADRAO-CODIGO.md) — análise do estilo usado nas APIs da Fase 3/4 (Program.cs enxuto via extension methods, middlewares separados, `InfoToken` scoped, etc.) que vamos reaproveitar aqui.
-
-## Pontos em aberto
-
-- [x] Segundo banco de dados → MongoDB, feedback do doador (`F5-CS-FeedbackApi`); snapshot de encerramento descartado em 2026-09-26
-- [x] Onde mora o Worker/Consumer do RabbitMQ → um único Worker (`F5-CS-DoacaoWorker`, consome `DoacaoRecebidaEvent`); o segundo Worker deixou de existir com a troca do Mongo
-- [x] Contrato do evento entre repos → **classe duplicada** em cada repo, mesmo padrão do FCG4 (`PaymentProcessedEvent` em Payments e Catalog), decidido em 2026-09-26. Namespace fixo `Shared.Contracts.Events` em todos os repos (MassTransit roteia pelo nome completo do tipo) + teste unitário em cada Worker conferindo o `FullName`. Ver [`MENSAGERIA.md`](./MENSAGERIA.md)
-- [x] Nomes dos serviços (2026-09-26): `F5-CS-UsersApi` (pronto), `F5-CS-CampanhasApi` (Campanhas+Doações, SQL Server), `F5-CS-DoacaoWorker`, `F5-CS-FeedbackApi` (Mongo)
-- [x] Frontend → descartado, fora do escopo (2026-09-26)
-- [x] Grafana coleta via **Prometheus no meio**, reaproveitando o `F4-FCG-MS-Orchestration` (2026-09-26)
-- [x] Kong Gateway sim (roteamento simples, declarative config, depois do MVP); **ElasticSearch fora do escopo** (2026-09-26)
+Classe duplicada por repositório, mesmo padrão do FCG4 (`PaymentProcessedEvent` em Payments e Catalog): o record `DoacaoRecebidaEvent` é copiado na API de Campanhas e no Worker, ambos em `namespace Shared.Contracts.Events` (o MassTransit roteia pelo nome completo do tipo). Mitigação do risco de divergência: teste unitário no Worker conferindo o `FullName`. Detalhes em [`MENSAGERIA.md`](./MENSAGERIA.md).
