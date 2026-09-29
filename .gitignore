@@ -22,3 +22,7 @@ appsettings.Local.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code (config/notas locais, fora do repo entregável)
+.claude/
+CLAUDE.md

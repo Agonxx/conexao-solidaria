@@ -75,8 +75,11 @@ Em [`../entregaveis/`](../entregaveis/): `diagrama-arquitetura.svg`/`.png` (micr
 ## README consolidado — pronto (2026-09-28)
 [`../README.md`](../README.md) reescrito: status atual, diagrama embutido, tabela de requisitos atendidos, links dos 5 repos, passo a passo resumido do k8s (build → secrets → infra → serviços na ordem certa → Kong), como acessar via Kong, observabilidade, CI/CD e limitações conhecidas. O `k8s/README.md` continua como referência detalhada (valores completos dos secrets, troubleshooting).
 
+## Script de load test da fila — pronto (2026-09-28)
+[`scripts/load-test-doacoes.ps1`](../scripts/load-test-doacoes.ps1): dispara N doações concorrentes (`RunspacePool`, compatível com Windows PowerShell 5.1 — máquina não tem `pwsh` 7) contra `POST /api/Doacao/Doar` via Kong. Loga (ou cadastra) um doador de teste, descobre a campanha ativa automaticamente via `Transparencia` (ou aceita `-CampanhaId`), e no fim mostra sucesso/falha, latência média e RPS. Pensado para o vídeo: rodar com RabbitMQ Management e Grafana abertos lado a lado, pra mostrar a fila enchendo e sendo drenada pelo Worker em tempo real.
+
 ## Próximos passos
-1. Vídeo de demonstração (≤15 min).
+1. Vídeo de demonstração (≤15 min) — usar o load test acima pra ilustrar a fila.
 2. Relatório de entrega (grupo, participantes/Discord, links de doc/repo/vídeo).
 
 ## Repos

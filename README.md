@@ -105,6 +105,15 @@ Exemplos de chamada (via Swagger/Postman, tudo passando pelo Kong em `http://loc
 
 Usuário `GestorONG` seed: `gestor@esperancasolidaria.org` / `Gestor@123`.
 
+### Load test da fila (script de demonstração)
+
+[`scripts/load-test-doacoes.ps1`](scripts/load-test-doacoes.ps1) dispara centenas de doações concorrentes contra o Kong para mostrar o fluxo assíncrono (fila enchendo no RabbitMQ Management e sendo drenada pelo `DoacaoWorker`, contador subindo no Grafana). Requer o `port-forward` do Kong de pé e uma campanha `Ativa` já criada:
+
+```powershell
+cd scripts
+powershell -ExecutionPolicy Bypass -File .\load-test-doacoes.ps1 -Count 500 -Concurrency 40
+```
+
 ## Observabilidade
 
 Prometheus descobre os 4 serviços via annotation `prometheus.io/scrape`. O dashboard do Grafana (`k8s/grafana-configmap.yaml`) traz RPS, erros 5xx, latência P95 e os contadores `doacoes_processadas_total`/`doacoes_ignoradas_total` do Worker.
